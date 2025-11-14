@@ -1,3 +1,4 @@
+require 'maps'
 --[[
 
 =====================================================================
@@ -84,14 +85,8 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
--- Set <space> as the leader key
--- See `:help mapleader`
---  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -166,6 +161,8 @@ vim.o.scrolloff = 10
 -- See `:help 'confirm'`
 vim.o.confirm = true
 
+vim.o.sessionoptions = 'blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions'
+
 -- tabs make 4 spaces
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
@@ -224,17 +221,39 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
     vim.hl.on_yank()
+    local copy_to_unnamedplus = require('vim.ui.clipboard.osc52').copy '+'
+    copy_to_unnamedplus(vim.v.event.regcontents)
+    local copy_to_unnamed = require('vim.ui.clipboard.osc52').copy '*'
+    copy_to_unnamed(vim.v.event.regcontents)
   end,
 })
 
--- [[ Install `lazy.nvim` plugin manager ]]
---    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
+local function paste()
+  return {
+    vim.fn.split(vim.fn.getreg '', '\n'),
+    vim.fn.getregtype '',
+  }
+end
+
+vim.g.clipboard = {
+  name = 'OSC 52',
+  copy = {
+    ['+'] = require('vim.ui.clipboard.osc52').copy '+',
+    ['*'] = require('vim.ui.clipboard.osc52').copy '*',
+  },
+  -- paste = {
+  --   ['+'] = require('vim.ui.clipboard.osc52').paste '+',
+  --   ['*'] = require('vim.ui.clipboard.osc52').paste '*',
+  -- },
+}
+-- [[ install `lazy.nvim` plugin manager ]]
+--    see `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
   local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
   if vim.v.shell_error ~= 0 then
-    error('Error cloning lazy.nvim:\n' .. out)
+    error('error cloning lazy.nvim:\n' .. out)
   end
 end
 
@@ -355,6 +374,7 @@ require('lazy').setup({
         { '<leader>s', group = '[S]earch' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        -- { '<leader>w', group = '[W]indow', mode = { 'n', 'v', 't' } },
       },
     },
   },
@@ -689,7 +709,8 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        pyright = {},
+        -- pyright = {},
+        basedpyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -732,6 +753,8 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'pyright',
+        'basedpyright',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -981,6 +1004,15 @@ require('lazy').setup({
         additional_vim_regex_highlighting = { 'ruby' },
       },
       indent = { enable = true, disable = { 'ruby' } },
+      incremental_selection = {
+        enable = true,
+        keymaps = {
+          init_selection = '<C-n>',
+          node_incremental = '<C-n>',
+          scope_incremental = '<C-s>',
+          node_decremental = '<C-m>',
+        },
+      },
     },
     -- There are additional nvim-treesitter modules that you can use to interact
     -- with nvim-treesitter. You should go explore a few and see what interests you:
@@ -1008,68 +1040,36 @@ require('lazy').setup({
 
   -- NOTE: Add my own plugins here (bknower):
   {
-
-    'ojroques/nvim-osc52',
-    config = function()
-      require('osc52').setup {
-        max_length = 0, -- Maximum length of selection (0 for no limit)
-        silent = false, -- Disable message on successful copy
-        trim = false, -- Trim surrounding whitespaces before copy
-      }
-      local function copy()
-        if (vim.v.event.operator == 'y' or vim.v.event.operator == 'd') and vim.v.event.regname == '' then
-          require('osc52').copy_register ''
-        end
-      end
-
-      vim.api.nvim_create_autocmd('TextYankPost', { callback = copy })
-    end,
-  },
-
-  {
-    'akinsho/toggleterm.nvim',
-    version = '*',
-    opts = {--[[ things you want to change go here]]
-      open_mapping = [[<c-;>]],
-    },
-  },
-  {
-    'folke/snacks.nvim',
-    priority = 1000,
+    'rmagatti/auto-session',
     lazy = false,
-    ---@module "snacks"
-    ---@type snacks.Config
+
+    ---enables autocomplete for opts
+    ---@module "auto-session"
+    ---@type AutoSession.Config
     opts = {
-      explorer = {
-        enabled = true,
-
-        replace_netrw = true, -- Replace netrw with the snacks explorer
-      },
-      indent = { enabled = true },
-      input = { enabled = true },
-      notifier = { enabled = true },
-      picker = { enabled = true },
-      scope = { enabled = true },
-      scroll = { enabled = true },
-      statuscolumn = { enabled = false }, -- we set this in options.lua
-      toggle = { enabled = true },
-      words = { enabled = true },
-    },
-    -- stylua: ignore
-    keys = {
-      { "<leader>n", function()
-        if Snacks.config.picker and Snacks.config.picker.enabled then
-          Snacks.picker.notifications()
-        else
-          Snacks.notifier.show_history()
-        end
-      end, desc = "Notification History" },
-      { "<leader>un", function() Snacks.notifier.hide() end, desc = "Dismiss All Notifications" },
-      { "<leader>oe", function() Snacks.explorer.open() end, desc = "Open Snacks Explorer" },
-      { "<leader>or", function() Snacks.explorer.reveal() end, desc = "Reveal Snacks Explorer" },
-
+      suppressed_dirs = { '~/', '~/Projects', '~/Downloads', '/' },
+      -- log_level = 'debug',
     },
   },
+  -- {
+  --
+  --   'ojroques/nvim-osc52',
+  --   config = function()
+  --     require('osc52').setup {
+  --       max_length = 0, -- Maximum length of selection (0 for no limit)
+  --       silent = false, -- Disable message on successful copy
+  --       trim = false, -- Trim surrounding whitespaces before copy
+  --     }
+  --     local function copy()
+  --       if (vim.v.event.operator == 'y' or vim.v.event.operator == 'd') and vim.v.event.regname == '' then
+  --         require('osc52').copy_register ''
+  --       end
+  --     end
+  --
+  --     vim.api.nvim_create_autocmd('TextYankPost', { callback = copy })
+  --   end,
+  -- },
+
   {
     'folke/noice.nvim',
     event = 'VeryLazy',
