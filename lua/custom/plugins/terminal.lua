@@ -1,0 +1,32 @@
+return {}
+-- return {
+--   {
+--     'rebelot/terminal.nvim',
+--     opts = {
+--       layout = { open_cmd = 'botright new' },
+--       cmd = { vim.o.shell },
+--       autoclose = false,
+--     },
+--     config = function(_, opts)
+--       require('terminal').setup(opts)
+--
+--       local term_map = require 'terminal.mappings'
+--       local terminal = require 'terminal'
+--       terminal:get_current_term
+--
+--       vim.keymap.set({ 'n', 'x', 'v', 't' }, '<leader>ts', term_map.operator_send, { expr = true, desc = 'Term: send operator' })
+--       vim.keymap.set({ 'n', 'x', 'v', 't' }, '<leader>to', term_map.toggle, { desc = 'Term: toggle' })
+--       vim.keymap.set({ 'n', 'x', 'v', 't' }, '<leader>tO', term_map.toggle { open_cmd = 'enew' }, { desc = 'Term: toggle (new buf)' })
+--       vim.keymap.set({ 'n', 'x', 'v', 't' }, '<leader>tr', term_map.run, { desc = 'Term: run' })
+--       vim.keymap.set({ 'n', 'x', 'v', 't' }, '<leader>tR', term_map.run(nil, { layout = { open_cmd = 'enew' } }), { desc = 'Term: run (new buf)' })
+--       vim.keymap.set({ 'n', 'x', 'v', 't' }, '<leader>tk', term_map.kill, { desc = 'Term: kill' })
+--       vim.keymap.set({ 'n', 'x', 'v', 't' }, '<leader>t]', term_map.cycle_next, { desc = 'Term: next' })
+--       vim.keymap.set({ 'n', 'x', 'v', 't' }, '<leader>t[', term_map.cycle_prev, { desc = 'Term: prev' })
+--       vim.keymap.set({ 'n', 'x', 'v', 't' }, '<leader>tl', term_map.move { open_cmd = 'belowright vnew' }, { desc = 'Term: move right split' })
+--       vim.keymap.set({ 'n', 'x', 'v', 't' }, '<leader>tL', term_map.move { open_cmd = 'botright vnew' }, { desc = 'Term: move far right' })
+--       vim.keymap.set({ 'n', 'x', 'v', 't' }, '<leader>th', term_map.move { open_cmd = 'belowright new' }, { desc = 'Term: move split below' })
+--       vim.keymap.set({ 'n', 'x', 'v', 't' }, '<leader>tH', term_map.move { open_cmd = 'botright new' }, { desc = 'Term: move bottom' })
+--       vim.keymap.set({ 'n', 'x', 'v', 't' }, '<leader>tf', term_map.move { open_cmd = 'float' }, { desc = 'Term: float' })
+--     end,
+--   },
+-- }

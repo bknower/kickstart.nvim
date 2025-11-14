@@ -1,47 +1,63 @@
-local toggleterm_manager = require 'toggleterm-manager'
-local actions = toggleterm_manager.actions
-return {
-  {
-    'akinsho/toggleterm.nvim',
-    version = '*',
-    ---@module "toggleterm"
-    --    ---@type ToggleTermConfig
-    opts = {--[[ things you want to change go here]]
-      -- open_mapping = [[<leader>ot]],
-      insert_mappings = true,
-      terminal_mappings = true,
-      start_in_insert = true,
-      autochdir = true,
-      persist_mode = false,
-      -- direction = 'vertical',
-    },
-    -- require('toggleterm').setup,
-    -- keys = {
-    --   { "<leader>oe", function() toggleterm. end, desc = "Open Snacks Explorer" },
-    -- }
-  },
-  {
-    'ryanmsnyder/toggleterm-manager.nvim',
-    dependencies = {
-      'akinsho/nvim-toggleterm.lua',
-      'nvim-telescope/telescope.nvim',
-      'nvim-lua/plenary.nvim', -- only needed because it's a dependency of telescope
-    },
-    config = function()
-      require('toggleterm-manager').setup {
-
-        mappings = {
-          i = {
-            ['<leader>ot'] = { action = actions.toggle_term, exit_on_action = true },
-          },
-          n = {
-            ['<leader>ot'] = { action = actions.toggle_term, exit_on_action = true },
-          },
-          t = {
-            ['<leader>ot'] = { action = actions.toggle_term, exit_on_action = true },
-          },
-        },
-      }
-    end,
-  },
-}
+return {}
+-- return {
+--   {
+--     'akinsho/toggleterm.nvim',
+--     version = '*',
+--     ---@module "toggleterm"
+--     --    ---@type ToggleTermConfig
+--     opts = {--[[ things you want to change go here]]
+--       -- open_mapping = [[<leader>ot]],
+--       insert_mappings = true,
+--       terminal_mappings = true,
+--       start_in_insert = true,
+--       autochdir = true,
+--       persist_mode = false,
+--       -- direction = 'vertical',
+--     },
+--     -- require('toggleterm').setup,
+--     -- keys = {
+--     --   { "<leader>oe", function() toggleterm. end, desc = "Open Snacks Explorer" },
+--     -- }
+--   },
+--   {
+--     'ryanmsnyder/toggleterm-manager.nvim',
+--     dependencies = {
+--       'akinsho/toggleterm.nvim', -- ✅ correct repo
+--       'nvim-telescope/telescope.nvim',
+--       'nvim-lua/plenary.nvim',
+--     },
+--     config = function()
+--       -- Ensure toggleterm is initialized (configure as you like)
+--       require('toggleterm').setup {} -- or your existing setup elsewhere
+--
+--       local toggleterm_manager = require 'toggleterm-manager'
+--       local actions = toggleterm_manager.actions
+--
+--       -- Global keymap to OPEN the Toggleterm Manager picker
+--       -- (use whatever lhs you prefer)
+--       vim.keymap.set({ 'n', 't' }, '<leader>ot', function()
+--         toggleterm_manager.open()
+--       end, { desc = 'ToggleTerm Manager' })
+--
+--       -- Picker-local mappings (apply inside Telescope picker)
+--       toggleterm_manager.setup {
+--         mappings = {
+--           i = {
+--             ['<CR>'] = { action = actions.toggle_term, exit_on_action = true },
+--             ['<C-x>'] = { action = actions.kill_term, exit_on_action = false },
+--           },
+--           n = {
+--             ['<CR>'] = { action = actions.toggle_term, exit_on_action = true },
+--             ['x'] = { action = actions.kill_term, exit_on_action = false },
+--           },
+--         },
+--       }
+--
+--       -- OPTIONAL: if Snacks Explorer also uses `ot`, unmap it to avoid collisions
+--       -- Require this after your snacks setup, or put it in snacks' setup:
+--       -- require('snacks').setup({ explorer = { keys = { ['ot'] = false } } })
+--       -- or:
+--       -- vim.keymap.del('n', '<leader>ot')  -- if Snacks bound it globally with that lhs
+--     end,
+--   },
+-- }
